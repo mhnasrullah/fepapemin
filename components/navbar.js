@@ -15,7 +15,7 @@ import {
   MenuDivider,
 } from "@chakra-ui/react";
 
-const Navbar = () => {
+const Navbar = ({ user, handleLogout }) => {
   return (
     <Box px={10}>
       <Flex my={5} h={16} alignItems="center" justifyContent="space-between">
@@ -30,32 +30,23 @@ const Navbar = () => {
         </Stack>
 
         <Flex gridColumnGap={4} alignItems="center">
-          {/* <Text fontSize="lg">Username</Text>
-          <Menu m={0}>
-            <MenuButton minW={0} rounded="full">
-              <Avatar size="sm" />
-            </MenuButton>
-            <MenuList>
-              <MenuItem
-                onClick={() => {
-                  console.log("Menambah Mata Kuliah");
-                }}
-              >
-                Tambah Mata Kuliah
-              </MenuItem>
-              <MenuDivider />
-              <MenuItem
-                onClick={() => {
-                  console.log("log out");
-                }}
-              >
-                Logout
-              </MenuItem>
-            </MenuList>
-          </Menu> */}
-          <Link href="./login">
-            <Button>Login</Button>
-          </Link>
+        {user ? (
+            <>
+              <Text fontSize="lg">{user.nama}</Text>
+              <Menu m={0}>
+                <MenuButton minW={0} rounded="full">
+                  <Avatar size="sm" />
+                </MenuButton>
+                <MenuList>
+                  <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                </MenuList>
+              </Menu>
+            </>
+          ) : (
+            <Link href="./login">
+              <Button>Login</Button>
+            </Link>
+          )}
         </Flex>
       </Flex>
     </Box>
