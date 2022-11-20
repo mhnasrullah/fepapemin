@@ -30,6 +30,7 @@ export default function Home() {
       pb={10}
       px={10}
     >
+      <Navbar />
       <Box
         rounded="lg"
         bg={useColorModeValue("white", "gray.700")}

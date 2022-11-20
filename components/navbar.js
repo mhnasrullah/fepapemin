@@ -20,12 +20,12 @@ const Navbar = () => {
     <Box px={10}>
       <Flex my={5} h={16} alignItems="center" justifyContent="space-between">
         <Heading as="h2" size="md">
-          Mahasiswa Mata Kuliah
+          Mahasiswa Prodi Mata Kuliah
         </Heading>
 
         <Stack spacing={8} alignItems="center">
           <Heading as="h3" size="lg">
-            Hard
+            Expert
           </Heading>
         </Stack>
 
