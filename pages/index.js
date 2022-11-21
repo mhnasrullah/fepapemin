@@ -31,21 +31,21 @@ export default function Home() {
 
   const getAllMahasiswa = async () => {
     try {
-      const res = await backend.get('/mahasiswa');
+      const res = await backend.get("/mahasiswa");
       setMahasiswas(res.data.mahasiswa);
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const getUserByToken = async () => {
     try {
-      const res = await backend.get('/mahasiswa/profile', {
+      const res = await backend.get("/mahasiswa/profile", {
         headers: {
           token,
           validateStatus: false,
         },
-      })
+      });
 
       if (res.status !== 200) {
         alert(res.data.message);
@@ -56,17 +56,17 @@ export default function Home() {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const handleLogout = () => {
     setToken(null);
     setUser(null);
-  }
+  };
 
   useEffect(() => {
     getAllMahasiswa();
     getUserByToken();
-  }, [token])
+  }, [token]);
 
   return (
     <Box
@@ -78,7 +78,11 @@ export default function Home() {
       pb={10}
       px={10}
     >
-      <Navbar user={user} handleLogout={handleLogout} />
+      <Navbar
+        user={user}
+        handleLogout={handleLogout}
+        handleLogin={() => router.push("/login")}
+      />
       <Box
         rounded="lg"
         bg={useColorModeValue("white", "gray.700")}
@@ -98,20 +102,27 @@ export default function Home() {
               </Tr>
             </Thead>
             <Tbody>
-              {mahasiswas && mahasiswas.map((mahasiswa, index) => (
-                <Tr key={mahasiswa.nim}>
-                  <Td>{index + 1}</Td>
-                  <Td>{mahasiswa.nim}</Td>
-                  <Td>{mahasiswa.nama}</Td>
-                  <Td>{mahasiswa.angkatan}</Td>
-                  <Td>{mahasiswa.prodi.nama}</Td>
-                  <Td>
-                    <Button size="sm" colorScheme="green" onClick={() => {router.push(`/users/${mahasiswa.nim}`)}}>
-                      Detail
-                    </Button>
-                  </Td>
-                </Tr>
-              ))}
+              {mahasiswas &&
+                mahasiswas.map((mahasiswa, index) => (
+                  <Tr key={mahasiswa.nim}>
+                    <Td>{index + 1}</Td>
+                    <Td>{mahasiswa.nim}</Td>
+                    <Td>{mahasiswa.nama}</Td>
+                    <Td>{mahasiswa.angkatan}</Td>
+                    <Td>{mahasiswa.prodi.nama}</Td>
+                    <Td>
+                      <Button
+                        size="sm"
+                        colorScheme="green"
+                        onClick={() => {
+                          router.push(`/users/${mahasiswa.nim}`);
+                        }}
+                      >
+                        Detail
+                      </Button>
+                    </Td>
+                  </Tr>
+                ))}
             </Tbody>
           </Table>
         </TableContainer>
