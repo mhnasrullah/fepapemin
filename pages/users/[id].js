@@ -29,7 +29,7 @@ const Detail = () => {
   const [mahasiswa, setMahasiswa] = useState([]);
   const [matakuliahList, setMatakuliahList] = useState([]);
   const [user, setUser] = useState(null);
-  const [matakuliahId, setMatakuliahId] = useState('');
+  const [matakuliahId, setMatakuliahId] = useState("");
   const { token, setToken } = useContext(AuthContext);
   const router = useRouter();
 
@@ -42,7 +42,7 @@ const Detail = () => {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const getMataKuliahList = async () => {
     try {
@@ -53,8 +53,7 @@ const Detail = () => {
     } catch (error) {
       console.log(error);
     }
-  }
-
+  };
 
   const getUserByToken = async () => {
     try {
@@ -74,13 +73,13 @@ const Detail = () => {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const addMataKuliah = async (e) => {
     e.preventDefault();
     try {
       const res = await backend.post(
-        `/mahasiswa/matakuliah/${matakuliahId}`,
+        `/mahasiswa/${mahasiswa.nim}/matakuliah/${matakuliahId}`,
         {},
         {
           headers: {
@@ -101,12 +100,12 @@ const Detail = () => {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
-  const deleteMataKuliah = async (matakuliahId) => {
+  const deleteMataKuliah = async (matakuliahId, nim) => {
     try {
       const res = await backend.put(
-        `/mahasiswa/matakuliah/${matakuliahId}`,
+        `/mahasiswa/${nim}/matakuliah/${matakuliahId}`,
         {},
         {
           headers: {
@@ -127,7 +126,7 @@ const Detail = () => {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const handleLogout = () => {
     setToken(null);
@@ -150,7 +149,12 @@ const Detail = () => {
       pb={10}
       px={10}
     >
-      <Navbar user={user} handleLogout={handleLogout} />
+      <Navbar
+        user={user}
+        handleLogout={handleLogout}
+        handleLogin={() => router.push("/login")}
+        homepage={() => router.push("/")}
+      />
       <Center py={6}>
         <Box
           maxW="5xl"
@@ -177,24 +181,24 @@ const Detail = () => {
 
           <form onSubmit={addMataKuliah}>
             <FormControl p={8}>
-                <InputGroup>
-                  <Select
-                    placeholder="Pilih Mata Kuliah"
-                    icon={<MdArrowDropDown />}
-                    value={matakuliahId}
-                    onChange={(e) => setMatakuliahId(e.target.value)}
-                  >
-                    {matakuliahList &&
-                      matakuliahList.map((mkList) => (
-                        <option value={mkList.id} key={mkList.id}>
-                          {mkList.id + " " + mkList.nama}
-                        </option>
-                      ))}
-                  </Select>
-                  <Button type="submit" size="md" colorScheme="green" mx={4}>
-                    Add
-                  </Button>
-                </InputGroup>
+              <InputGroup>
+                <Select
+                  placeholder="Pilih Mata Kuliah"
+                  icon={<MdArrowDropDown />}
+                  value={matakuliahId}
+                  onChange={(e) => setMatakuliahId(e.target.value)}
+                >
+                  {matakuliahList &&
+                    matakuliahList.map((mkList) => (
+                      <option value={mkList.id} key={mkList.id}>
+                        {mkList.id + " " + mkList.nama}
+                      </option>
+                    ))}
+                </Select>
+                <Button type="submit" size="md" colorScheme="green" mx={4}>
+                  Add
+                </Button>
+              </InputGroup>
             </FormControl>
           </form>
           <Box
@@ -216,18 +220,23 @@ const Detail = () => {
                 </Thead>
 
                 <Tbody>
-                  {/* di bawah ini hanya placeholder untuk maping :) */}
                   {mahasiswa.matakuliah?.map((mk) => (
-                      <Tr key={mk.id}>
-                        <Td>{mk.id}</Td>
-                        <Td>{mk.nama}</Td>
-                        <Td>
-                            <Button size="sm" colorScheme="red" onClick={() => deleteMataKuliah(mk.id)}>
-                              Delete
-                            </Button>
-                          </Td>
-                      </Tr>
-                    ))}
+                    <Tr key={mk.id}>
+                      <Td>{mk.id}</Td>
+                      <Td>{mk.nama}</Td>
+                      <Td>
+                        <Button
+                          size="sm"
+                          colorScheme="red"
+                          onClick={() =>
+                            deleteMataKuliah(mk.id, router.query.id)
+                          }
+                        >
+                          Delete
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))}
                 </Tbody>
               </Table>
             </TableContainer>
