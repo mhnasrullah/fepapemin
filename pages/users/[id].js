@@ -14,12 +14,143 @@ import {
   Th,
   Tbody,
   Td,
+  FormControl,
+  InputGroup,
+  Select,
 } from "@chakra-ui/react";
-import Layout from "../../components/layout";
+import { useRouter } from "next/router";
+import { useContext, useEffect, useState } from "react";
+import { MdArrowDropDown } from "react-icons/md";
+import backend from "../../api/backend";
+import Navbar from "../../components/navbar";
+import { AuthContext } from "../../utils/AuthContext";
 
 const Detail = () => {
+  const [mahasiswa, setMahasiswa] = useState([]);
+  const [matakuliahList, setMatakuliahList] = useState([]);
+  const [user, setUser] = useState(null);
+  const [matakuliahId, setMatakuliahId] = useState('');
+  const { token, setToken } = useContext(AuthContext);
+  const router = useRouter();
+
+  const getMahasiswa = async (nim) => {
+    try {
+      const res = await backend.get(`/mahasiswa/${nim}`);
+
+      console.log(res.data.mahasiswa.matakuliah);
+      setMahasiswa(res.data.mahasiswa);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getMataKuliahList = async () => {
+    try {
+      const res = await backend.get(`/matakuliah`);
+
+      console.log(res.data.matakuliah);
+      setMatakuliahList(res.data.matakuliah);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+  const getUserByToken = async () => {
+    try {
+      const res = await backend.get("/mahasiswa/profile", {
+        headers: {
+          token,
+          validateStatus: false,
+        },
+      });
+
+      if (res.status !== 200) {
+        alert(res.data.message);
+        return;
+      }
+
+      return setUser(res.data.mahasiswa);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const addMataKuliah = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await backend.post(
+        `/mahasiswa/matakuliah/${matakuliahId}`,
+        {},
+        {
+          headers: {
+            token,
+            validateStatus: false,
+          },
+        },
+      );
+
+      if (res.status !== 200) {
+        alert(res.data.message);
+        return;
+      }
+
+      alert(res.data.message);
+      getMahasiswa(router.query.id);
+      return;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const deleteMataKuliah = async (matakuliahId) => {
+    try {
+      const res = await backend.put(
+        `/mahasiswa/matakuliah/${matakuliahId}`,
+        {},
+        {
+          headers: {
+            token,
+            validateStatus: false,
+          },
+        },
+      );
+
+      if (res.status !== 200) {
+        alert(res.data.message);
+        return;
+      }
+
+      alert(res.data.message);
+      getMahasiswa(router.query.id);
+      return;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const handleLogout = () => {
+    setToken(null);
+    setUser(null);
+  };
+
+  useEffect(() => {
+    getMahasiswa(router.query.id);
+    getMataKuliahList();
+    getUserByToken();
+  }, [token]);
+
   return (
-    <Layout>
+    <Box
+      justify="center"
+      align="center"
+      minH="100vh"
+      bg={useColorModeValue("`gray.50", "gray.800")}
+      pt={5}
+      pb={10}
+      px={10}
+    >
+      <Navbar user={user} handleLogout={handleLogout} />
       <Center py={6}>
         <Box
           maxW="5xl"
@@ -38,81 +169,72 @@ const Detail = () => {
             pos="relative"
           />
           <Heading fontSize="2xl" fontFamily="body">
-            Username
+            {mahasiswa.nama}
           </Heading>
           <Text fontWeight={600} color="gray.500" mb={4}>
-            195150701111000
-          </Text>
-          <Text fontWeight={600} color="gray.500" mb={4}>
-            Teknologi Informasi (2019)
+            {mahasiswa.nim}
           </Text>
 
+          <form onSubmit={addMataKuliah}>
+            <FormControl p={8}>
+                <InputGroup>
+                  <Select
+                    placeholder="Pilih Mata Kuliah"
+                    icon={<MdArrowDropDown />}
+                    value={matakuliahId}
+                    onChange={(e) => setMatakuliahId(e.target.value)}
+                  >
+                    {matakuliahList &&
+                      matakuliahList.map((mkList) => (
+                        <option value={mkList.id} key={mkList.id}>
+                          {mkList.id + " " + mkList.nama}
+                        </option>
+                      ))}
+                  </Select>
+                  <Button type="submit" size="md" colorScheme="green" mx={4}>
+                    Add
+                  </Button>
+                </InputGroup>
+            </FormControl>
+          </form>
           <Box
-            p={8}
+            justifyContent="center"
+            alignItems="center"
             rounded="lg"
-            boxShadow="sm"
             bg={useColorModeValue("white", "gray.700")}
+            p={8}
+            boxShadow="lg"
           >
             <TableContainer>
               <Table>
                 <Thead>
                   <Tr>
-                    <Th>No</Th>
-                    <Th>Kode Mata Kuliah</Th>
+                    <Th>Kode MK</Th>
                     <Th>Mata Kuliah</Th>
+                    <Th>Action</Th>
                   </Tr>
                 </Thead>
 
                 <Tbody>
-                  <Tr>
-                    <Td>1</Td>
-                    <Td>CIT60029</Td>
-                    <Td>Internet Of Things</Td>
-                  </Tr>
-
-                  <Tr>
-                    <Td>1</Td>
-                    <Td>CIT60029</Td>
-                    <Td>Internet Of Things</Td>
-                  </Tr>
-
-                  <Tr>
-                    <Td>1</Td>
-                    <Td>CIT60029</Td>
-                    <Td>Internet Of Things</Td>
-                  </Tr>
+                  {/* di bawah ini hanya placeholder untuk maping :) */}
+                  {mahasiswa.matakuliah?.map((mk) => (
+                      <Tr key={mk.id}>
+                        <Td>{mk.id}</Td>
+                        <Td>{mk.nama}</Td>
+                        <Td>
+                            <Button size="sm" colorScheme="red" onClick={() => deleteMataKuliah(mk.id)}>
+                              Delete
+                            </Button>
+                          </Td>
+                      </Tr>
+                    ))}
                 </Tbody>
               </Table>
             </TableContainer>
           </Box>
-
-          <Stack mt={5} justifyContent="right" direction="row" spacing={4}>
-            <Button
-              fontSize="sm"
-              rounded="full"
-              bg="green.400"
-              color="white"
-              _hover={{
-                bg: "green.500",
-              }}
-            >
-              Edit
-            </Button>
-            <Button
-              fontSize="sm"
-              rounded="full"
-              bg="red.400"
-              color="white"
-              _hover={{
-                bg: "red.500",
-              }}
-            >
-              Delete
-            </Button>
-          </Stack>
         </Box>
       </Center>
-    </Layout>
+    </Box>
   );
 };
 
