@@ -21,11 +21,13 @@ import Navbar from "../components/navbar";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../utils/AuthContext";
 import backend from "../api/backend";
+import { useRouter } from "next/router";
 
 export default function Home() {
   const [mahasiswas, setMahasiswas] = useState([]);
   const [user, setUser] = useState(null);
   const { token, setToken } = useContext(AuthContext);
+  const router = useRouter();
 
   const getAllMahasiswa = async () => {
     try {
@@ -104,7 +106,7 @@ export default function Home() {
                   <Td>{mahasiswa.angkatan}</Td>
                   <Td>{mahasiswa.prodi.nama}</Td>
                   <Td>
-                    <Button size="sm" colorScheme="green" onClick={() => {}}>
+                    <Button size="sm" colorScheme="green" onClick={() => {router.push(`/users/${mahasiswa.nim}`)}}>
                       Detail
                     </Button>
                   </Td>
