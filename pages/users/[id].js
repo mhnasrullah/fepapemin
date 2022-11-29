@@ -37,7 +37,6 @@ const Detail = () => {
     try {
       const res = await backend.get(`/mahasiswa/${nim}`);
 
-      console.log(res.data.mahasiswa.matakuliah);
       setMahasiswa(res.data.mahasiswa);
     } catch (error) {
       console.log(error);
@@ -48,7 +47,6 @@ const Detail = () => {
     try {
       const res = await backend.get(`/matakuliah`);
 
-      console.log(res.data.matakuliah);
       setMatakuliahList(res.data.matakuliah);
     } catch (error) {
       console.log(error);

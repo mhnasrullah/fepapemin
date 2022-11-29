@@ -1,4 +1,5 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import API from '../utils/endpoints'
 
 import {
   Box,
@@ -21,14 +22,13 @@ import {
 
 import { BiIdCard, BiLockAlt, BiShow, BiHide } from "react-icons/bi";
 import { useRouter } from "next/router";
-import { AuthContext } from "../utils/AuthContext";
-import backend from "../api/backend";
+// import backend from "../api/backend";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [nim, setNim] = useState("");
   const [password, setPassword] = useState("");
-  const { setToken } = useContext(AuthContext);
+  const [error,setError] = useState([])
 
   const router = useRouter();
 
@@ -36,35 +36,21 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (nim === "" || password === "") {
-      alert("NIM dan Password tidak boleh kosong");
-      return;
-    }
-
     const user = {
       nim,
       password,
     }
-
     handleLogin(user);
   };
 
   const handleLogin = async (user) => {
-    try {
-      const res = await backend.post('auth/login', user, {
-        validateStatus: false,
-      });
-
-      if (res.status !== 200) {
-        alert(res.data.message);
-        return;
-      }
-
-      setToken(res.data.token);
-      router.push('/');
-    } catch (error) {
-      console.log(error);
+    try{
+      const {data : data} = await API.login(user);
+      localStorage.setItem("user",JSON.stringify(data));
+      router.push("/")
+    }catch(e){
+      const {data:{error}} = e.response
+      setError(error)
     }
   }
 
@@ -86,6 +72,15 @@ const Login = () => {
           p={8}
           boxShadow="lg"
         >
+          {error.length !== 0 && (
+            <div style={{marginBottom : '16px'}}>
+              {error.map((e)=>(
+                <Text
+                color={"#ba2c16"} 
+                key={e}>{e}</Text>
+              ))}
+            </div>
+          )}
           <form onSubmit={handleSubmit}>
             <Stack spacing={4}>
               <FormControl>

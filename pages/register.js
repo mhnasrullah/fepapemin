@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import backend from '../api/backend';
+import API from "../utils/endpoints";
 
 import {
   Flex,
@@ -32,6 +33,7 @@ const Register = () => {
   const [angkatan, setAngkatan] = useState("");
   const [prodi, setProdi] = useState("");
   const [prodiList, setProdiList] = useState([]);
+  const [error,setError] = useState([]);
 
   const router = useRouter();
 
@@ -39,21 +41,19 @@ const Register = () => {
 
   const registerUser = async (values) => {
     try {
-      const res = await backend.post("/auth/register", values, {
-        validateStatus: false,
-      });
-
-      return res.data;
+      const {data : {message}} = await API.register(values);
+      router.push('/login');
+      console.log(message);
     } catch (error) {
-      console.log(error);
+      const {data : {error : e}} = error.response;
+      setError(e)
     }
   };
 
   const getProdi = async () => {
     try {
-      const res = await backend.get("/prodi");
-
-      setProdiList(res.data.prodi);
+      const {data : {data}} = await API.getAllProdi();
+      setProdiList(data);
     } catch (error) {
       console.log(error);
     }
@@ -64,13 +64,12 @@ const Register = () => {
     const values = {
       nim,
       nama,
-      angkatan,
-      prodiId: prodi,
+      angkatan: parseInt(angkatan),
+      prodi: parseInt(prodi),
       password,
     }
 
     registerUser(values);
-    router.push('/login');
   };
 
   useEffect(() => {
@@ -95,6 +94,15 @@ const Register = () => {
           p={8}
           boxShadow="lg"
         >
+          {error.length !== 0 && (
+            <div style={{marginBottom : '16px'}}>
+              {error.map((e)=>(
+                <Text
+                color={"#ba2c16"} 
+                key={e}>{e}</Text>
+              ))}
+            </div>
+          )}
           <form onSubmit={handleSubmit}>
             <Stack spacing={4}>
               <FormControl>
@@ -134,7 +142,7 @@ const Register = () => {
                     onChange={(e) => setProdi(e.target.value)}
                   >
                     { prodiList && prodiList.map((prodiItem) => {
-                      return <option value={prodiItem.id} key={prodiItem.id}>{prodiItem.nama}</option>
+                      return <option value={parseInt(prodiItem.id)} key={prodiItem.id}>{prodiItem.nama}</option>
                     }) }
                   </Select>
                 </InputGroup>
@@ -147,9 +155,9 @@ const Register = () => {
                     value={angkatan}
                     onChange={(e) => setAngkatan(e.target.value)}
                   >
-                    <option value="2019">2019</option>
-                    <option value="2020">2020</option>
-                    <option value="2021">2021</option>
+                    <option value={2019}>2019</option>
+                    <option value={2020}>2020</option>
+                    <option value={2021}>2021</option>
                   </Select>
                 </InputGroup>
               </FormControl>

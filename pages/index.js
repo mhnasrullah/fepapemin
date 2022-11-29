@@ -22,6 +22,7 @@ import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../utils/AuthContext";
 import backend from "../api/backend";
 import { useRouter } from "next/router";
+import API from '../utils/endpoints'
 
 export default function Home() {
   const [mahasiswas, setMahasiswas] = useState([]);
@@ -31,8 +32,9 @@ export default function Home() {
 
   const getAllMahasiswa = async () => {
     try {
-      const res = await backend.get("/mahasiswa");
-      setMahasiswas(res.data.mahasiswa);
+      // const res = await backend.get("/mahasiswa");
+      const {data : {data : data}} = await API.getAllMahasiswa()
+      setMahasiswas(data);
     } catch (error) {
       console.log(error);
     }
@@ -103,13 +105,13 @@ export default function Home() {
             </Thead>
             <Tbody>
               {mahasiswas &&
-                mahasiswas.map((mahasiswa, index) => (
+                mahasiswas?.map((mahasiswa, index) => (
                   <Tr key={mahasiswa.nim}>
                     <Td>{index + 1}</Td>
                     <Td>{mahasiswa.nim}</Td>
                     <Td>{mahasiswa.nama}</Td>
                     <Td>{mahasiswa.angkatan}</Td>
-                    <Td>{mahasiswa.prodi.nama}</Td>
+                    <Td>{mahasiswa.Prodi.nama}</Td>
                     <Td>
                       <Button
                         size="sm"
