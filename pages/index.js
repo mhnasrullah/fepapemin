@@ -38,7 +38,8 @@ export default function Home() {
   const getAllMahasiswa = async () => {
     try {
       setLoading(true)
-      const {data : {data : data}} = await API.getAllMahasiswa()
+      const {data : {data : data}} = await API.getAllMahasiswa();
+      console.log(data)
       setMahasiswas(data);
       setLoading(false)
     } catch (error) {
@@ -134,7 +135,7 @@ export default function Home() {
                       <Td>{mahasiswa.nim}</Td>
                       <Td>{mahasiswa.nama}</Td>
                       <Td>{mahasiswa.angkatan}</Td>
-                      <Td>{mahasiswa.Prodi.nama}</Td>
+                      <Td>{mahasiswa.Prodi ? mahasiswa.Prodi.nama : "unset"}</Td>
                       <Td>
                         <Button
                           size="sm"

@@ -24,9 +24,10 @@ import { MdArrowDropDown } from "react-icons/md";
 import backend from "../../api/backend";
 import Navbar from "../../components/navbar";
 import { AuthContext } from "../../utils/AuthContext";
+import API from "../../utils/endpoints"
 
 const Detail = () => {
-  const [mahasiswa, setMahasiswa] = useState([]);
+  const [mahasiswa, setMahasiswa] = useState({});
   const [matakuliahList, setMatakuliahList] = useState([]);
   const [user, setUser] = useState(null);
   const [matakuliahId, setMatakuliahId] = useState("");
@@ -35,9 +36,8 @@ const Detail = () => {
 
   const getMahasiswa = async (nim) => {
     try {
-      const res = await backend.get(`/mahasiswa/${nim}`);
-
-      setMahasiswa(res.data.mahasiswa);
+      const {data : {data}} = await API.getOneMahasiswa(nim);
+      setMahasiswa(data)
     } catch (error) {
       // console.log(error);
     }
@@ -45,8 +45,8 @@ const Detail = () => {
 
   const getMataKuliahList = async () => {
     try {
-      const res = await backend.get(`/matakuliah`);
-      setMatakuliahList(res.data.matakuliah);
+      const {data : {matkul}} = await API.getAllMataKuliah();
+      setMatakuliahList(matkul)
     } catch (error) {
       // console.log(error);
     }
@@ -164,7 +164,7 @@ const Detail = () => {
         >
           <Avatar
             size="2xl"
-            name="Username"
+            name={mahasiswa.nama}
             alt="Avatar Alt"
             mb={4}
             pos="relative"
@@ -188,7 +188,7 @@ const Detail = () => {
                   {matakuliahList &&
                     matakuliahList.map((mkList) => (
                       <option value={mkList.id} key={mkList.id}>
-                        {mkList.id + " " + mkList.nama}
+                        {mkList.nama}
                       </option>
                     ))}
                 </Select>
@@ -217,23 +217,24 @@ const Detail = () => {
                 </Thead>
 
                 <Tbody>
-                  {mahasiswa.matakuliah?.map((mk) => (
-                    <Tr key={mk.id}>
-                      <Td>{mk.id}</Td>
-                      <Td>{mk.nama}</Td>
-                      <Td>
-                        <Button
-                          size="sm"
-                          colorScheme="red"
-                          onClick={() =>
-                            deleteMataKuliah(mk.id, router.query.id)
-                          }
-                        >
-                          Delete
-                        </Button>
-                      </Td>
-                    </Tr>
-                  ))}
+                  {mahasiswa.Matakuliahs && 
+                    mahasiswa.Matakuliahs.map(({nama , Mahasiswa_matakuliah : {matakuliahId : id}}) => (
+                      <Tr key={id}>
+                        <Td>{id}</Td>
+                        <Td>{nama}</Td>
+                        <Td>
+                          <Button
+                            size="sm"
+                            colorScheme="red"
+                            onClick={() =>
+                              deleteMataKuliah(id, router.query.id)
+                            }
+                          >
+                            Delete
+                          </Button>
+                        </Td>
+                      </Tr>
+                    ))}
                 </Tbody>
               </Table>
             </TableContainer>

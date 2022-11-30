@@ -41,9 +41,9 @@ const Register = () => {
 
   const registerUser = async (values) => {
     try {
-      const {data : {message}} = await API.register(values);
+      await API.register(values);
       router.push('/login');
-      console.log(message);
+      // console.log(message);
     } catch (error) {
       const {data : {error : e}} = error.response;
       setError(e)

@@ -10,7 +10,13 @@ export default {
     getAllMahasiswa : () => {
         return Api().get("/mahasiswa");
     },
+    getOneMahasiswa : (nim) => {
+        return Api().get(`/mahasiswa/${nim}`);
+    },
     getAllProdi : () => {
         return Api().get("/prodi");
+    },
+    getAllMataKuliah : () => {
+        return Api().get("/matakuliah");
     }
 }
