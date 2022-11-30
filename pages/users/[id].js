@@ -39,17 +39,16 @@ const Detail = () => {
 
       setMahasiswa(res.data.mahasiswa);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
   const getMataKuliahList = async () => {
     try {
       const res = await backend.get(`/matakuliah`);
-
       setMatakuliahList(res.data.matakuliah);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -69,7 +68,7 @@ const Detail = () => {
 
       return setUser(res.data.mahasiswa);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -96,7 +95,7 @@ const Detail = () => {
       getMahasiswa(router.query.id);
       return;
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -122,7 +121,7 @@ const Detail = () => {
       getMahasiswa(router.query.id);
       return;
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 

@@ -22,6 +22,7 @@ import {
 
 import { BiIdCard, BiLockAlt, BiShow, BiHide } from "react-icons/bi";
 import { useRouter } from "next/router";
+import axios from "axios";
 // import backend from "../api/backend";
 
 const Login = () => {
@@ -45,12 +46,16 @@ const Login = () => {
 
   const handleLogin = async (user) => {
     try{
-      const {data : data} = await API.login(user);
+      const {data : {message : {status, ...data}}} = await API.login(user)
       localStorage.setItem("user",JSON.stringify(data));
       router.push("/")
     }catch(e){
-      const {data:{error}} = e.response
-      setError(error)
+      if(e.response){
+        const {data:{error}} = e.response
+        setError(error)
+      }else{
+        console.log(e);
+      }
     }
   }
 
