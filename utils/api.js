@@ -2,7 +2,7 @@ import axios from "axios";
 
 const api = (config = {}) => {
     const axiosInstance = axios.create({
-		baseURL : 'http://localhost:3000',
+		baseURL : process.env.NEXT_PUBLIC_API_URL,
 		withCredentials: false,
 		headers: {
 			Accept: 'application/json',
@@ -37,7 +37,7 @@ const api = (config = {}) => {
                         refreshToken
                     }
                     try{
-                        const {data : {token : access_token}} = await axios.post("http://localhost:3000/auth/freshToken",provideData);
+                        const {data : {token : access_token}} = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/freshToken`,provideData);
                         
                         const newItem = {
                             token : access_token,

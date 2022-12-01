@@ -22,7 +22,7 @@ import styles from "../styles/Home.module.css";
 import Navbar from "../components/navbar";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../utils/AuthContext";
-import backend from "../api/backend";
+// import backend from "../api/backend";
 import { useRouter } from "next/router";
 import API from '../utils/endpoints'
 import authorize from "../utils/authorize";
@@ -38,9 +38,8 @@ export default function Home() {
   const getAllMahasiswa = async () => {
     try {
       setLoading(true)
-      const {data : {data : data}} = await API.getAllMahasiswa();
-      console.log(data)
-      setMahasiswas(data);
+      const {data : {mahasiswa}} = await API.getAllMahasiswa();
+      setMahasiswas(mahasiswa);
       setLoading(false)
     } catch (error) {
       setLoading(false)
@@ -53,25 +52,25 @@ export default function Home() {
     }
   };
 
-  const getUserByToken = async () => {
-    try {
-      const res = await backend.get("/mahasiswa/profile", {
-        headers: {
-          token,
-          validateStatus: false,
-        },
-      });
+  // const getUserByToken = async () => {
+  //   try {
+  //     const res = await backend.get("/mahasiswa/profile", {
+  //       headers: {
+  //         token,
+  //         validateStatus: false,
+  //       },
+  //     });
 
-      if (res.status !== 200) {
-        alert(res.data.message);
-        return;
-      }
+  //     if (res.status !== 200) {
+  //       alert(res.data.message);
+  //       return;
+  //     }
 
-      return setUser(res.data.mahasiswa);
-    } catch (error) {
-      // console.log(error);
-    }
-  };
+  //     return setUser(res.data.mahasiswa);
+  //   } catch (error) {
+  //     // console.log(error);
+  //   }
+  // };
 
   const handleLogout = () => {
     setToken(null);
@@ -82,7 +81,7 @@ export default function Home() {
 
   useEffect(() => {
     getAllMahasiswa();
-    getUserByToken();
+    // getUserByToken();
   }, []);
 
   return (

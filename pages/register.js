@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import backend from '../api/backend';
+// import backend from '../api/backend';
 import API from "../utils/endpoints";
 
 import {
@@ -52,8 +52,8 @@ const Register = () => {
 
   const getProdi = async () => {
     try {
-      const {data : {data}} = await API.getAllProdi();
-      setProdiList(data);
+      const {data : {prodi}} = await API.getAllProdi();
+      setProdiList(prodi);
     } catch (error) {
       console.log(error);
     }

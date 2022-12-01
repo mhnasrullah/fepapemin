@@ -46,7 +46,7 @@ const Login = () => {
 
   const handleLogin = async (user) => {
     try{
-      const {data : {message : {status, ...data}}} = await API.login(user)
+      const {data : {status, ...data}} = await API.login(user)
       localStorage.setItem("user",JSON.stringify(data));
       router.push("/")
     }catch(e){

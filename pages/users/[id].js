@@ -21,108 +21,97 @@ import {
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { MdArrowDropDown } from "react-icons/md";
-import backend from "../../api/backend";
+// import backend from "../../api/backend";
 import Navbar from "../../components/navbar";
 import { AuthContext } from "../../utils/AuthContext";
+import authorize from "../../utils/authorize";
 import API from "../../utils/endpoints"
 
-const Detail = () => {
+const Detail = ({id}) => {
   const [mahasiswa, setMahasiswa] = useState({});
   const [matakuliahList, setMatakuliahList] = useState([]);
   const [user, setUser] = useState(null);
-  const [matakuliahId, setMatakuliahId] = useState("");
+  const [matakuliahId, setMatakuliahId] = useState(null);
+  const [loading,setLoading] = useState(false);
+  const [actions,setActions] = useState(false)
   const { token, setToken } = useContext(AuthContext);
+  const [error, setError] = useState([]);
   const router = useRouter();
 
   const getMahasiswa = async (nim) => {
+    setLoading(true)
     try {
-      const {data : {data}} = await API.getOneMahasiswa(nim);
-      setMahasiswa(data)
+      const {data : {mahasiswa}} = await API.getOneMahasiswa(nim);
+      setMahasiswa(mahasiswa)
     } catch (error) {
       // console.log(error);
     }
+    setLoading(false)
   };
 
   const getMataKuliahList = async () => {
+    
     try {
-      const {data : {matkul}} = await API.getAllMataKuliah();
-      setMatakuliahList(matkul)
+      const {data : {matakuliah}} = await API.getAllMataKuliah();
+      setMatakuliahList(matakuliah)
     } catch (error) {
       // console.log(error);
     }
+    
   };
 
-  const getUserByToken = async () => {
-    try {
-      const res = await backend.get("/mahasiswa/profile", {
-        headers: {
-          token,
-          validateStatus: false,
-        },
-      });
+  // const getUserByToken = async () => {
+  //   try {
+  //     const res = await backend.get("/mahasiswa/profile", {
+  //       headers: {
+  //         token,
+  //         validateStatus: false,
+  //       },
+  //     });
 
-      if (res.status !== 200) {
-        alert(res.data.message);
-        return;
-      }
+  //     if (res.status !== 200) {
+  //       alert(res.data.message);
+  //       return;
+  //     }
 
-      return setUser(res.data.mahasiswa);
-    } catch (error) {
-      // console.log(error);
-    }
-  };
+  //     return setUser(res.data.mahasiswa);
+  //   } catch (error) {
+  //     // console.log(error);
+  //   }
+  // };
 
   const addMataKuliah = async (e) => {
     e.preventDefault();
-    try {
-      const res = await backend.post(
-        `/mahasiswa/${mahasiswa.nim}/matakuliah/${matakuliahId}`,
-        {},
-        {
-          headers: {
-            token,
-            validateStatus: false,
-          },
-        },
-      );
-
-      if (res.status !== 200) {
-        alert(res.data.message);
-        return;
+    if(matakuliahId){
+      setActions(true);
+      try{
+        await API.addMataKuliah(id,matakuliahId);
+        setMatakuliahId(null)
+      }catch(e){
+        // console.log(e.response)
+        if(e.response){
+          const {data : {error}} = e.response
+          // console.log(data)
+          setError(error)
+        }else{
+          console.log(e);
+        }
       }
-
-      alert(res.data.message);
-      getMahasiswa(router.query.id);
-      return;
-    } catch (error) {
-      // console.log(error);
+      setActions(false);
     }
   };
 
-  const deleteMataKuliah = async (matakuliahId, nim) => {
+  const deleteMataKuliah = async (nim, matkul) => {
+    setActions(true)
     try {
-      const res = await backend.put(
-        `/mahasiswa/${nim}/matakuliah/${matakuliahId}`,
-        {},
-        {
-          headers: {
-            token,
-            validateStatus: false,
-          },
-        },
-      );
+      const {status} = await API.deleteMataKuliah(nim,matkul);
+      if(status == 200){
 
-      if (res.status !== 200) {
-        alert(res.data.message);
-        return;
       }
-
-      alert(res.data.message);
-      getMahasiswa(router.query.id);
-      return;
     } catch (error) {
       // console.log(error);
     }
+    setActions(false);
   };
 
   const handleLogout = () => {
@@ -131,11 +120,20 @@ const Detail = () => {
   };
 
   useEffect(() => {
-    getMahasiswa(router.query.id);
-    getMataKuliahList();
-    getUserByToken();
-  }, [token]);
+    if(actions == false){
+      getMahasiswa(id);
+      getMataKuliahList();
+      setActions("");
 
+      if(error.length !== 0){
+        setTimeout(()=>setError([]),2000)
+      }
+    }
+  }, [actions]);
+
+  authorize();
+
+  
   return (
     <Box
       justify="center"
@@ -175,14 +173,17 @@ const Detail = () => {
           <Text fontWeight={600} color="gray.500" mb={4}>
             {mahasiswa.nim}
           </Text>
-
+          {error.length !== 0 &&
+            error.map((e)=>(
+              <Text color={'red'} key={e}>{e}</Text>
+            ))}
           <form onSubmit={addMataKuliah}>
             <FormControl p={8}>
               <InputGroup>
                 <Select
                   placeholder="Pilih Mata Kuliah"
                   icon={<MdArrowDropDown />}
-                  value={matakuliahId}
+                  value={matakuliahId || ""}
                   onChange={(e) => setMatakuliahId(e.target.value)}
                 >
                   {matakuliahList &&
@@ -206,6 +207,7 @@ const Detail = () => {
             p={8}
             boxShadow="lg"
           >
+            {loading ? (<div>loading...</div>) : (
             <TableContainer>
               <Table>
                 <Thead>
@@ -218,16 +220,16 @@ const Detail = () => {
 
                 <Tbody>
                   {mahasiswa.Matakuliahs && 
-                    mahasiswa.Matakuliahs.map(({nama , Mahasiswa_matakuliah : {matakuliahId : id}}) => (
-                      <Tr key={id}>
-                        <Td>{id}</Td>
+                    mahasiswa.Matakuliahs.map(({nama , id : idMatkul}) => (
+                      <Tr key={idMatkul}>
+                        <Td>{idMatkul}</Td>
                         <Td>{nama}</Td>
                         <Td>
                           <Button
                             size="sm"
                             colorScheme="red"
                             onClick={() =>
-                              deleteMataKuliah(id, router.query.id)
+                              deleteMataKuliah(id, idMatkul)
                             }
                           >
                             Delete
@@ -238,11 +240,24 @@ const Detail = () => {
                 </Tbody>
               </Table>
             </TableContainer>
+            )}
           </Box>
         </Box>
       </Center>
     </Box>
   );
 };
+
+export async function getStaticProps({params}) {
+  return {
+    props: {
+      id : params.id,
+    }
+  }
+}
+
+export async function getStaticPaths() {
+  return { paths: [], fallback: 'blocking' }
+}
 
 export default Detail;

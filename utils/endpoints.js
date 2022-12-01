@@ -18,5 +18,11 @@ export default {
     },
     getAllMataKuliah : () => {
         return Api().get("/matakuliah");
-    }
+    },
+    addMataKuliah : (nim,id) => {
+        return Api().post(`/mahasiswa/${nim}/matakuliah/${id}`);
+    },
+    deleteMataKuliah : (nim,id) => {
+        return Api().put(`/mahasiswa/${nim}/matakuliah/${id}`);
+    },
 }
