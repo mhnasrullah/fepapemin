@@ -44,10 +44,19 @@ const Detail = ({id}) => {
       const {data : {mahasiswa}} = await API.getOneMahasiswa(nim);
       setMahasiswa(mahasiswa)
     } catch (error) {
-      // console.log(error);
+      console.log(error);
     }
     setLoading(false)
   };
+
+  const getUserProfile = async () => {
+    try {
+      const {data : {mahasiswa}} = await API.getProfileMahasiswa();
+      setUser(mahasiswa)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const getMataKuliahList = async () => {
     
@@ -55,30 +64,10 @@ const Detail = ({id}) => {
       const {data : {matakuliah}} = await API.getAllMataKuliah();
       setMatakuliahList(matakuliah)
     } catch (error) {
-      // console.log(error);
+      console.log(error);
     }
     
   };
-
-  // const getUserByToken = async () => {
-  //   try {
-  //     const res = await backend.get("/mahasiswa/profile", {
-  //       headers: {
-  //         token,
-  //         validateStatus: false,
-  //       },
-  //     });
-
-  //     if (res.status !== 200) {
-  //       alert(res.data.message);
-  //       return;
-  //     }
-
-  //     return setUser(res.data.mahasiswa);
-  //   } catch (error) {
-  //     // console.log(error);
-  //   }
-  // };
 
   const addMataKuliah = async (e) => {
     e.preventDefault();
@@ -88,10 +77,8 @@ const Detail = ({id}) => {
         await API.addMataKuliah(id,matakuliahId);
         setMatakuliahId(null)
       }catch(e){
-        // console.log(e.response)
         if(e.response){
           const {data : {error}} = e.response
-          // console.log(data)
           setError(error)
         }else{
           console.log(e);
@@ -109,7 +96,7 @@ const Detail = ({id}) => {
 
       }
     } catch (error) {
-      // console.log(error);
+      console.log(error);
     }
     setActions(false);
   };
@@ -124,7 +111,7 @@ const Detail = ({id}) => {
       getMahasiswa(id);
       getMataKuliahList();
       setActions("");
-
+      getUserProfile()
       if(error.length !== 0){
         setTimeout(()=>setError([]),2000)
       }

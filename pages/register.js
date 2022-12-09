@@ -43,7 +43,6 @@ const Register = () => {
     try {
       await API.register(values);
       router.push('/login');
-      // console.log(message);
     } catch (error) {
       const {data : {error : e}} = error.response;
       setError(e)

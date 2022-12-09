@@ -52,25 +52,14 @@ export default function Home() {
     }
   };
 
-  // const getUserByToken = async () => {
-  //   try {
-  //     const res = await backend.get("/mahasiswa/profile", {
-  //       headers: {
-  //         token,
-  //         validateStatus: false,
-  //       },
-  //     });
-
-  //     if (res.status !== 200) {
-  //       alert(res.data.message);
-  //       return;
-  //     }
-
-  //     return setUser(res.data.mahasiswa);
-  //   } catch (error) {
-  //     // console.log(error);
-  //   }
-  // };
+  const getUserProfile = async () => {
+    try {
+      const {data : {mahasiswa}} = await API.getProfileMahasiswa();
+      setUser(mahasiswa)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const handleLogout = () => {
     setToken(null);
@@ -81,6 +70,7 @@ export default function Home() {
 
   useEffect(() => {
     getAllMahasiswa();
+    getUserProfile();
     // getUserByToken();
   }, []);
 

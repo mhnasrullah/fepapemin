@@ -10,6 +10,9 @@ export default {
     getAllMahasiswa : () => {
         return Api().get("/mahasiswa");
     },
+    getProfileMahasiswa : () => {
+        return Api().get("/mahasiswa/profile");
+    },
     getOneMahasiswa : (nim) => {
         return Api().get(`/mahasiswa/${nim}`);
     },
