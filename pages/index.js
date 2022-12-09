@@ -62,8 +62,9 @@ export default function Home() {
   }
 
   const handleLogout = () => {
-    setToken(null);
-    setUser(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    router.push("/login")
   };
 
   authorize();
